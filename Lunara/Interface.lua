@@ -1,7 +1,7 @@
-    local player = game:GetService("Players").LocalPlayer
+local player = game:GetService("Players").LocalPlayer
 local mouse = player:GetMouse()
 
-local input = game:GetService("UserInputService")
+local userinputs = game:GetService("UserInputService")
 local run = game:GetService("RunService")
 local tween = game:GetService("TweenService")
 local tweeninfo = TweenInfo.new
@@ -93,7 +93,7 @@ do
 		self.keybinds = {}
 		self.ended = {}
 
-		input.InputBegan:Connect(function(key,proc)
+		userinputs.InputBegan:Connect(function(key,proc)
 			if self.keybinds[key.KeyCode] and not proc then
 				for i, bind in pairs(self.keybinds[key.KeyCode]) do
 					bind()
@@ -101,7 +101,7 @@ do
 			end
 		end)
 
-		input.InputEnded:Connect(function(key)
+		userinputs.InputEnded:Connect(function(key)
 			if key.UserInputType == Enum.UserInputType.MouseButton1 then
 				for i, callback in pairs(self.ended) do
 					callback()
@@ -128,10 +128,10 @@ do
 	end
 
 	function utility:KeyPressed()
-		local key = input.InputBegan:Wait()
+		local key = userinputs.InputBegan:Wait()
 
 		while key.UserInputType ~= Enum.UserInputType.Keyboard do
-			key = input.InputBegan:Wait()
+			key = userinputs.InputBegan:Wait()
 		end
 
 		wait()
@@ -166,7 +166,7 @@ do
 			end
 		end)
 
-		input.InputChanged:Connect(function(input)
+		userinputs.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
 				local delta = input.Position - mousePos
 				parent.Position  = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
@@ -178,8 +178,52 @@ do
 	function utility:DraggingEnded(callback)
 		table.insert(self.ended, callback)
 	end
-
 end
+
+local usingSomething = false
+task.wait()
+
+local function makeDraggable(frame)
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		if usingSomething == false then
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end
+	
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	frame.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	userinputs.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end
+
+
 
 local library = {}
 local page = {}
@@ -287,8 +331,8 @@ do
 		})
 
 		utility:InitializeKeybind()
-		utility:DraggingEnabled(container.Main.TopBar, container.Main)
-
+		-- utility:DraggingEnabled(container.Main.TopBar, container.Main)
+		makeDraggable(container.Main)
 		local navToggled = false
 		container.Main.TopBar.Menu.MouseButton1Click:Connect(function()
 			if navToggled then
@@ -1639,6 +1683,9 @@ do
 
 		slider.MouseButton1Down:Connect(function(input)
 			dragging = true
+			if usingSomething == false then
+				usingSomething = true
+			end
 
 			while dragging do
 				utility:Tween(circle, {ImageTransparency = 0}, 0.1)
@@ -1650,6 +1697,7 @@ do
 			end
 
 			wait(0.5)
+			usingSomething = false
 			utility:Tween(circle, {ImageTransparency = 1}, 0.2)
 		end)
 
