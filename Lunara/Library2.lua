@@ -362,7 +362,7 @@ do
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 26),
-			ZIndex = 13,
+			ZIndex = 12,
 			AutoButtonColor = false,
 			Font = Enum.Font.Gotham,
 			Text = "",
@@ -374,7 +374,7 @@ do
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0, 40, 0.5, 0),
 				Size = UDim2.new(0, 76, 1, 0),
-				ZIndex = 14,
+				ZIndex = 11,
 				Font = Enum.Font.Gotham,
 				Text = title,
 				TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -388,7 +388,7 @@ do
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0, 12, 0.5, 0),
 				Size = UDim2.new(0, 16, 0, 16),
-				ZIndex = 14,
+				ZIndex = 11,
 				Image = "rbxassetid://" .. tostring(icon),
 				ImageColor3 = Color3.fromRGB(255, 255, 255),
 				ImageTransparency = 0.64
@@ -1567,6 +1567,8 @@ do
 		return colorpicker
 	end
 
+
+	local slideingRN = false
 	function section:addSlider(title, default, min, max, callback)
 		local slider = utility:Create("ImageButton", {
 			Name = "Slider",
@@ -1682,10 +1684,9 @@ do
 		end)
 
 		slider.MouseButton1Down:Connect(function(input)
+			if slideingRN then return end
+			slideingRN = true
 			dragging = true
-			if usingSomething == false then
-				usingSomething = true
-			end
 
 			while dragging do
 				utility:Tween(circle, {ImageTransparency = 0}, 0.1)
@@ -1697,7 +1698,7 @@ do
 			end
 
 			wait(0.5)
-			usingSomething = false
+			slideingRN = false
 			utility:Tween(circle, {ImageTransparency = 1}, 0.2)
 		end)
 
