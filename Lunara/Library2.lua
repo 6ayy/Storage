@@ -1682,6 +1682,10 @@ do
 
 		self:updateSlider(slider, nil, value, min, max)
 
+		utility:DraggingEnded(function()
+			dragging = false
+		end)
+
 		local Entered = false
 		slider.MouseEnter:Connect(function()
 			Entered = true
@@ -1704,11 +1708,14 @@ do
 									
 							utility:Tween(circle, {ImageTransparency = 0}, 0.1)
 
-							value = self:updateSlider(slider, nil, value, min, max)
+							value = self:updateSlider(slider, nil, nil, min, max, value)
 							callback(value)
 							run.Heartbeat:Wait()
 						end
 						usingSomething = false
+						wait(0.5)
+						utility:Tween(circle, {ImageTransparency = 1}, 0.1)
+
 					end
 				end)
 			end
@@ -1719,28 +1726,6 @@ do
 			end
 		end)
 
-		-- utility:DraggingEnded(function()
-		-- 	dragging = false
-		-- end)
-
-		-- slider.MouseButton1Down:Connect(function(input)
-		-- 	if slideingRN then return end
-		-- 	slideingRN = true
-		-- 	dragging = true
-
-		-- 	while dragging do
-		-- 		utility:Tween(circle, {ImageTransparency = 0}, 0.1)
-
-		-- 		value = self:updateSlider(slider, nil, nil, min, max, value)
-		-- 		callback(value)
-
-		-- 		utility:Wait()
-		-- 	end
-
-		-- 	wait(0.5)
-		-- 	slideingRN = false
-		-- 	utility:Tween(circle, {ImageTransparency = 1}, 0.2)
-		-- end)
 
 		textbox.FocusLost:Connect(function()
 			if not tonumber(textbox.Text) then
@@ -2258,3 +2243,5 @@ do
 end
 
 return library
+
+
