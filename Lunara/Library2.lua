@@ -1682,7 +1682,6 @@ do
 
 		self:updateSlider(slider, nil, value, min, max)
 
-
 		local Entered = false
 		slider.MouseEnter:Connect(function()
 			Entered = true
@@ -1702,13 +1701,11 @@ do
 							if usingSomething == false then
 								usingSomething = true
 							end
-												
-							local mouse_location = gMouse()
-							local x = (slider.AbsoluteSize.X - (slider.AbsoluteSize.X - ((mouse_location.X - slider.AbsolutePosition.X)) + 1)) / slider.AbsoluteSize.X
+									
+							utility:Tween(circle, {ImageTransparency = 0}, 0.1)
 
-							value = self:updateSlider(slider, x, nil, min, max)
+							value = self:updateSlider(slider, nil, value, min, max)
 							callback(value)
-
 							run.Heartbeat:Wait()
 						end
 						usingSomething = false
