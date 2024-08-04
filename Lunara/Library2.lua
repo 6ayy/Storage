@@ -1706,28 +1706,8 @@ do
 							local mouse_location = gMouse()
 							local x = (slider.AbsoluteSize.X - (slider.AbsoluteSize.X - ((mouse_location.X - slider.AbsolutePosition.X)) + 1)) / slider.AbsoluteSize.X
 
-							local min = 0
-							local max = 1
-
-							local size = min
-							if x >= min and x <= max then
-								size = x
-							elseif x < min then
-								size = min
-							elseif x > max then
-								size = max
-							end
-
-							local p = math.floor((size or min) * 100)
-
-							local maxv = max
-							local minv = min
-							local diff = maxv - minv
-
-							value = self:updateSlider(slider, nil, nil, min, max, value)
+							value = self:updateSlider(slider, x, nil, min, max)
 							callback(value)
-
-
 
 							run.Heartbeat:Wait()
 						end
