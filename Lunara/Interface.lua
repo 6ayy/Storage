@@ -362,7 +362,7 @@ do
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 26),
-			ZIndex = 3,
+			ZIndex = 12,
 			AutoButtonColor = false,
 			Font = Enum.Font.Gotham,
 			Text = "",
