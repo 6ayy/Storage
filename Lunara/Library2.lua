@@ -189,15 +189,15 @@ local function makeDraggable(frame)
 	local dragStart
 	local startPos
 	
-	local function update(input)
+	local function update(input2)
 		if usingSomething == false then
-			local delta = input.Position - dragStart
+			local delta = input2.Position - dragStart
 			frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 		end
 	end
 	
-	frame.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+	frame.InputBegan:Connect(function(input2)
+		if input2.UserInputType == Enum.UserInputType.MouseButton1 or input2.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
 			dragStart = input.Position
 			startPos = frame.Position
@@ -210,15 +210,15 @@ local function makeDraggable(frame)
 		end
 	end)
 	
-	frame.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			dragInput = input
+	frame.InputChanged:Connect(function(input2)
+		if input2.UserInputType == Enum.UserInputType.MouseMovement or input2.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input2
 		end
 	end)
 	
-	UIS.InputChanged:Connect(function(input)
-		if input == dragInput and dragging then
-			update(input)
+	input.InputChanged:Connect(function(input2)
+		if input2 == dragInput and dragging then
+			update(input2)
 		end
 	end)
 end
