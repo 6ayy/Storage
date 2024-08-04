@@ -1724,11 +1724,10 @@ do
 							local minv = min
 							local diff = maxv - minv
 
-							local sel_value = math.floor((diff * p) + minv)
+							value = self:updateSlider(slider, nil, nil, min, max, value)
+							callback(value)
 
-							-- value.Text = tostring(sel_value)
-							pcall(callback, sel_value)
-							self:updateSlider(slider, nil, nil, min, max, sel_value)
+
 
 							run.Heartbeat:Wait()
 						end
