@@ -223,6 +223,9 @@ local function makeDraggable(frame)
 	end)
 end
 
+local function gMouse()
+	return Vector2.new(userinputs:GetMouseLocation().X + 1, userinputs:GetMouseLocation().Y - 35)
+end
 
 
 local library = {}
@@ -1679,28 +1682,89 @@ do
 
 		self:updateSlider(slider, nil, value, min, max)
 
-		utility:DraggingEnded(function()
-			dragging = false
+
+		local Entered = false
+		slider.MouseEnter:Connect(function()
+			Entered = true
+		end)
+		slider.MouseLeave:Connect(function()
+			Entered = false
 		end)
 
-		slider.MouseButton1Down:Connect(function(input)
-			if slideingRN then return end
-			slideingRN = true
-			dragging = true
+		local Held = false
+		userinputs.InputBegan:Connect(function(inputObject)
+			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
+				Held = true
 
-			while dragging do
-				utility:Tween(circle, {ImageTransparency = 0}, 0.1)
+				spawn(function() -- Loop check
+					if Entered then
+						while Held do
+							if usingSomething == false then
+								usingSomething = true
+							end
+												
+							local mouse_location = gMouse()
+							local x = (slider.AbsoluteSize.X - (slider.AbsoluteSize.X - ((mouse_location.X - slider.AbsolutePosition.X)) + 1)) / slider.AbsoluteSize.X
 
-				value = self:updateSlider(slider, nil, nil, min, max, value)
-				callback(value)
+							local min = 0
+							local max = 1
 
-				utility:Wait()
+							local size = min
+							if x >= min and x <= max then
+								size = x
+							elseif x < min then
+								size = min
+							elseif x > max then
+								size = max
+							end
+
+							local p = math.floor((size or min) * 100)
+
+							local maxv = max
+							local minv = min
+							local diff = maxv - minv
+
+							local sel_value = math.floor(((diff / 100) * p) + minv)
+
+							-- value.Text = tostring(sel_value)
+							pcall(callback, sel_value)
+							self:updateSlider(slider, nil, nil, min, max, sel_value)
+
+							run.Heartbeat:Wait()
+						end
+						usingSomething = false
+					end
+				end)
 			end
-
-			wait(0.5)
-			slideingRN = false
-			utility:Tween(circle, {ImageTransparency = 1}, 0.2)
 		end)
+		userinputs.InputEnded:Connect(function(inputObject)
+			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
+				Held = false
+			end
+		end)
+
+		-- utility:DraggingEnded(function()
+		-- 	dragging = false
+		-- end)
+
+		-- slider.MouseButton1Down:Connect(function(input)
+		-- 	if slideingRN then return end
+		-- 	slideingRN = true
+		-- 	dragging = true
+
+		-- 	while dragging do
+		-- 		utility:Tween(circle, {ImageTransparency = 0}, 0.1)
+
+		-- 		value = self:updateSlider(slider, nil, nil, min, max, value)
+		-- 		callback(value)
+
+		-- 		utility:Wait()
+		-- 	end
+
+		-- 	wait(0.5)
+		-- 	slideingRN = false
+		-- 	utility:Tween(circle, {ImageTransparency = 1}, 0.2)
+		-- end)
 
 		textbox.FocusLost:Connect(function()
 			if not tonumber(textbox.Text) then
