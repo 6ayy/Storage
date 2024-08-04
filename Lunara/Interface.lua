@@ -223,6 +223,9 @@ local function makeDraggable(frame)
 	end)
 end
 
+local function gMouse()
+	return Vector2.new(userinputs:GetMouseLocation().X + 1, userinputs:GetMouseLocation().Y - 35)
+end
 
 
 local library = {}
@@ -1567,6 +1570,8 @@ do
 		return colorpicker
 	end
 
+
+	local slideingRN = false
 	function section:addSlider(title, default, min, max, callback)
 		local slider = utility:Create("ImageButton", {
 			Name = "Slider",
@@ -1681,21 +1686,46 @@ do
 			dragging = false
 		end)
 
-		slider.MouseButton1Down:Connect(function(input)
-			dragging = true
-
-			while dragging do
-				utility:Tween(circle, {ImageTransparency = 0}, 0.1)
-
-				value = self:updateSlider(slider, nil, nil, min, max, value)
-				callback(value)
-
-				utility:Wait()
-			end
-
-			wait(0.5)
-			utility:Tween(circle, {ImageTransparency = 1}, 0.2)
+		local Entered = false
+		slider.MouseEnter:Connect(function()
+			Entered = true
 		end)
+		slider.MouseLeave:Connect(function()
+			Entered = false
+		end)
+
+		local Held = false
+		userinputs.InputBegan:Connect(function(inputObject)
+			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
+				Held = true
+
+				spawn(function() -- Loop check
+					if Entered then
+						while Held do
+							if usingSomething == false then
+								usingSomething = true
+							end
+									
+							utility:Tween(circle, {ImageTransparency = 0}, 0.1)
+
+							value = self:updateSlider(slider, nil, nil, min, max, value)
+							callback(value)
+							run.Heartbeat:Wait()
+						end
+						usingSomething = false
+						wait(0.5)
+						utility:Tween(circle, {ImageTransparency = 1}, 0.1)
+
+					end
+				end)
+			end
+		end)
+		userinputs.InputEnded:Connect(function(inputObject)
+			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
+				Held = false
+			end
+		end)
+
 
 		textbox.FocusLost:Connect(function()
 			if not tonumber(textbox.Text) then
@@ -2213,3 +2243,4 @@ do
 end
 
 return library
+
