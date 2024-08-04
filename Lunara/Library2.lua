@@ -1724,7 +1724,7 @@ do
 							local minv = min
 							local diff = maxv - minv
 
-							local sel_value = math.floor(((diff / 100) * p) + minv)
+							local sel_value = math.floor((diff * p) + minv)
 
 							-- value.Text = tostring(sel_value)
 							pcall(callback, sel_value)
