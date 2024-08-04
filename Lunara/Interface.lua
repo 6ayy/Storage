@@ -1683,9 +1683,6 @@ do
 
 		slider.MouseButton1Down:Connect(function(input)
 			dragging = true
-			if usingSomething == false then
-				usingSomething = true
-			end
 
 			while dragging do
 				utility:Tween(circle, {ImageTransparency = 0}, 0.1)
@@ -1697,7 +1694,6 @@ do
 			end
 
 			wait(0.5)
-			usingSomething = false
 			utility:Tween(circle, {ImageTransparency = 1}, 0.2)
 		end)
 
